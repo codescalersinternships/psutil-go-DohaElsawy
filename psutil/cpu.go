@@ -20,20 +20,15 @@ type CpuInfo struct {
 }
 
 type cpuFile struct {
-	fileName string
+	fileName string  
 }
 
-
-type icpu interface {
-	loadCpudata() (string, error)
-}
-
-var _ icpu = (*cpuFile)(nil)
 
 func GetCpuInfo() (CpuInfo, error) {
-	file := newCpuFile("")
+	
+	cpuf := newCpuFile()
 
-	data, err := file.loadCpudata()
+	data, err := cpuf.loadCpudata()
 
 	if err != nil {
 		return CpuInfo{},nil
@@ -49,19 +44,9 @@ func GetCpuInfo() (CpuInfo, error) {
 	return cpu, nil
 }
 
-func newCpuFile(path string) cpuFile {
+func newCpuFile() cpuFile{
 	return cpuFile{
-		fileName: path,
-	}
-}
-
-func newCpu() CpuInfo {
-	return CpuInfo{
-		Vendor:    "",
-		MdoelName: "",
-		CPUMHZ:    0,
-		CacheSize: "",
-		whenQuit:  4,
+		fileName: "/proc/cpuinfo",
 	}
 }
 
@@ -75,6 +60,18 @@ func (fcpu *cpuFile) loadCpudata() (string, error) {
 
 	return string(data), nil
 }
+
+
+func newCpu() CpuInfo {
+	return CpuInfo{
+		Vendor:    "",
+		MdoelName: "",
+		CPUMHZ:    0,
+		CacheSize: "",
+		whenQuit:  4,
+	}
+}
+
 
 func (c *CpuInfo) parseCpuData(data string) error {
 
