@@ -1,7 +1,6 @@
 package psutil
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,41 +23,14 @@ func TestCpuInfo(t *testing.T) {
 
 }
 
-
-
-type fakeCpuFile struct {
-	fileName string
-}
-
-func newfakeCpuFile() fakeCpuFile {
-	return fakeCpuFile{
-		fileName: "./testdata/fakecpufile.txt",
-	}
-}
-
-func (fcpu *fakeCpuFile) loadCpudata() (string, error) {
-
-	data, err := os.ReadFile(fcpu.fileName)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
-}
-
-
 func TestLoadData(t *testing.T) {
 
-	file := newfakeCpuFile()
+	file := newCpuFile()
 
-	data, err := file.loadCpudata()
+	data, err := file.readData("./testdata/fakecpufile.txt")
 
 	assert.NoError(t, err)
 
 	assert.NotEmpty(t, data)
 
 }
-
-
-

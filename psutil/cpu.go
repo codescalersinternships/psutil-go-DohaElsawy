@@ -20,7 +20,7 @@ type CpuInfo struct {
 }
 
 type cpuFile struct {
-	fileName string  
+	readData func(path string) (string, error)  
 }
 
 
@@ -28,7 +28,7 @@ func GetCpuInfo() (CpuInfo, error) {
 	
 	cpuf := newCpuFile()
 
-	data, err := cpuf.loadCpudata()
+	data, err := cpuf.readData("/proc/cpuinfo")
 
 	if err != nil {
 		return CpuInfo{},nil
@@ -44,21 +44,16 @@ func GetCpuInfo() (CpuInfo, error) {
 	return cpu, nil
 }
 
-type icpuFile interface {
-	loadCpudata() (string, error)
-}
-
-var _ icpuFile = (*cpuFile)(nil)
 
 func newCpuFile() cpuFile{
 	return cpuFile{
-		fileName: "/proc/cpuinfo",
+		readData: loadCpudata,
 	}
 }
 
-func (fcpu *cpuFile) loadCpudata() (string, error) {
+func loadCpudata(path string) (string, error) {
 
-	data, err := os.ReadFile(fcpu.fileName)
+	data, err := os.ReadFile(path)
 
 	if err != nil {
 		return "", err
