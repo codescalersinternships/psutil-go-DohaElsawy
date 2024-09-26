@@ -11,17 +11,18 @@ func TestCpu(t *testing.T) {
 	t.Run("valid case", func(t *testing.T) {
 
 		expect := &Cpu{
-			Vendor:    "GenuineIntel",
-			MdoelName: "Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz",
-			CacheSize: "8192 KB",
-			CPUMHZ:    3500,
+			vendor:    "GenuineIntel",
+			mdoelName: "Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz",
+			cacheSize: "8192 KB",
+			cPUMHZ:    1100.752,
 			whenQuit:  0,
-			fileName: "/proc/cpuinfo",
+			fileName: "./testdata/fakecpufile.txt",
 		}
 
 		c := InitCPU()
+		c.fileName = "./testdata/fakecpufile.txt"
 
-		err := c.CpuGetInfo()
+		err := c.GetCpuInfo()
 
 		assert.Equal(t, expect, c)
 		assert.NoError(t, err)
@@ -30,10 +31,10 @@ func TestCpu(t *testing.T) {
 }
 
 func TestLoaddata(t *testing.T) {
-	scanner, err := loadCpudata("./testdata/fakecpufile.txt")
+	data, err := loadCpudata("./testdata/fakecpufile.txt")
 
 	assert.NoError(t, err)
 
-	assert.NotEmpty(t, scanner)
+	assert.NotEmpty(t, data)
 
 }

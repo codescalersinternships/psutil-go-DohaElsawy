@@ -2,6 +2,7 @@ package psutil
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -11,27 +12,29 @@ var (
 	ErrNotFindEnoughFields = errors.New("cpuinfo: did't find all data")
 )
 
+type ICpu interface {
+	InitCPU()
+	CpuGetInfo()
+}
 
 type Cpu struct {
-	Vendor    string
-	MdoelName string
-	CacheSize string
-	CPUMHZ    float64
+	vendor    string
+	mdoelName string
+	cacheSize string
+	cPUMHZ    float64
 	whenQuit  int
 	fileName  string
 }
 
-func InitCPU() *Cpu{
+func InitCPU() *Cpu {
 	return &Cpu{
-		Vendor:    "",
-		MdoelName: "",
-		CacheSize: "",
+		vendor:    "",
+		mdoelName: "",
+		cacheSize: "",
 		whenQuit:  4,
 		fileName:  "/proc/cpuinfo",
 	}
 }
-
-
 
 func loadCpudata(fileName string) (string, error) {
 	fcpu, err := os.ReadFile(fileName)
@@ -43,7 +46,7 @@ func loadCpudata(fileName string) (string, error) {
 	return string(fcpu), nil
 }
 
-func (c *Cpu) CpuGetInfo() (error) {
+func (c *Cpu) GetCpuInfo() error {
 
 	data, err := loadCpudata(c.fileName)
 
@@ -63,15 +66,15 @@ func (c *Cpu) CpuGetInfo() (error) {
 		value = strings.TrimSpace(value)
 
 		if key == "vendor_id" {
-			c.Vendor = value
+			c.vendor = value
 			c.whenQuit--
 		}
 		if key == "cache size" {
-			c.CacheSize = value
+			c.cacheSize = value
 			c.whenQuit--
 		}
 		if key == "model name" {
-			c.MdoelName = value
+			c.mdoelName = value
 			c.whenQuit--
 		}
 		if key == "cpu MHz" {
@@ -79,15 +82,21 @@ func (c *Cpu) CpuGetInfo() (error) {
 			if err != nil {
 				return err
 			}
-			c.CPUMHZ = convVal
+			c.cPUMHZ = convVal
 			c.whenQuit--
 		}
 
-		if c.whenQuit == 0 {
+		if c.whenQuit < 1 {
 			return nil
 		}
 
 	}
 
 	return ErrNotFindEnoughFields
+}
+
+func (c *Cpu) String() string {
+
+	return fmt.Sprintf("cpd vecder is: %s\ncpu model name is: %s\ncache size is: %s\ncpu MHz is: %f\n", c.vendor, c.mdoelName, c.cacheSize, c.cPUMHZ)
+
 }
