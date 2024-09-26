@@ -44,6 +44,12 @@ func GetCpuInfo() (CpuInfo, error) {
 	return cpu, nil
 }
 
+type icpuFile interface {
+	loadCpudata() (string, error)
+}
+
+var _ icpuFile = (*cpuFile)(nil)
+
 func newCpuFile() cpuFile{
 	return cpuFile{
 		fileName: "/proc/cpuinfo",
