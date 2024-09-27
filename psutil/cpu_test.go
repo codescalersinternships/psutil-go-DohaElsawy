@@ -67,7 +67,7 @@ apicid		: 0`,
 			err: nil,
 		},
 		{
-			description: "whenQuit is less than fields number",
+			description: "only found one field",
 			expected: CpuInfo{
 				Vendor:    "GenuineIntel",
 				MdoelName: "",
@@ -82,7 +82,7 @@ model		: 126`,
 			err: ErrFindEnoughFields,
 		},
 		{
-			description: "whenQuit is larger than fields number",
+			description: "not found any field",
 			expected: CpuInfo{
 				Vendor:    "",
 				MdoelName: "",
