@@ -23,16 +23,9 @@ type memFile struct {
 	fileName string
 }
 
+
 func GetMemInfo() (MemInfo, error) {
-
-	defaultPath := "/proc/meminfo"
-
-	return getMemInfo(defaultPath)
-
-}
-
-func getMemInfo(path string) (MemInfo, error) {
-	memf := newMemFile(path)
+	memf := newMemFile()
 
 	data, err := memf.loadData()
 
@@ -61,9 +54,9 @@ func (m *memFile) loadData() (string, error) {
 	return string(data), nil
 }
 
-func newMemFile(path string) memFile {
+func newMemFile() memFile {
 	return memFile{
-		fileName: path,
+		fileName: "/proc/meminfo",
 	}
 }
 

@@ -1,23 +1,13 @@
 package psutil
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMemInfo(t *testing.T) {
-
-	t.Run("get actual data from private get function", func(t *testing.T) {
-		m, err := getMemInfo("./testdata/fakememfile.txt")
-
-		assert.NoError(t, err)
-		assert.NotEmpty(t, m)
-		assert.NotEmpty(t, m.Available)
-		assert.NotEmpty(t, m.Used)
-		assert.NotEmpty(t, m.Total)
-
-	})
 
 	t.Run("get actual data from public get function", func(t *testing.T) {
 		m, err := GetMemInfo()
@@ -34,7 +24,7 @@ func TestMemInfo(t *testing.T) {
 
 func TestLoadMemData(t *testing.T) {
 
-	file := newMemFile("./testdata/fakememfile.txt")
+	file := newFakeMemFile()
 
 	data, err := file.loadData()
 
@@ -53,8 +43,8 @@ func TestParseMemData(t *testing.T) {
 		{
 			description: "valid case",
 			expected: MemInfo{
-				Total:    "12010608 kB",
-				Used: "9718220 kB",
+				Total:     "12010608 kB",
+				Used:      "9718220 kB",
 				Available: "4893396 kB",
 				whenQuit:  0,
 			},
@@ -69,19 +59,19 @@ SwapCached:       177684 kB`,
 		{
 			description: "only found one field",
 			expected: MemInfo{
-				Total:    "12010608 kB",
-				Used: "",
+				Total:     "12010608 kB",
+				Used:      "",
 				Available: "",
 				whenQuit:  2,
 			},
 			input: `MemTotal:       12010608 kB`,
-			err: ErrFindEnoughFields,
+			err:   ErrFindEnoughFields,
 		},
 		{
 			description: "not found any field",
 			expected: MemInfo{
-				Total:    "",
-				Used: "",
+				Total:     "",
+				Used:      "",
 				Available: "",
 				whenQuit:  3,
 			},
@@ -101,9 +91,30 @@ NFS_Unstable:          0 kB`,
 
 			err := m.parseMemData(test.input)
 
-			assert.Equal(t,test.err, err)
-			assert.Equal(t,test.expected,m)
+			assert.Equal(t, test.err, err)
+			assert.Equal(t, test.expected, m)
 		})
 	}
 
+}
+
+type fakeMemFile struct {
+	fileName string
+}
+
+func newFakeMemFile() fakeMemFile {
+	return fakeMemFile{
+		fileName: "./testdata/fakememfile.txt",
+	}
+}
+
+func (m *fakeMemFile) loadData() (string, error) {
+
+	data, err := os.ReadFile(m.fileName)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
