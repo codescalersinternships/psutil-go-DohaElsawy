@@ -10,7 +10,7 @@ func TestMemInfo(t *testing.T) {
 
 	t.Run("get actual data", func(t *testing.T) {
 
-		m, err := GetMemInfo()
+		m, err := getMemInfo("./testdata/fakememfile.txt")
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, m)
@@ -24,9 +24,9 @@ func TestMemInfo(t *testing.T) {
 
 func TestLoadMemData(t *testing.T) {
 
-	file := newMemFile()
+	file := newMemFile("./testdata/fakememfile.txt")
 
-	data, err := file.readData("./testdata/fakememfile.txt")
+	data, err := file.loadData()
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, data)

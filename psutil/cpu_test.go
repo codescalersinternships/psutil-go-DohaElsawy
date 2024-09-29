@@ -10,7 +10,7 @@ func TestCpuInfo(t *testing.T) {
 
 	t.Run("get actual data", func(t *testing.T) {
 
-		c, err := GetCpuInfo()
+		c, err := getCpuInfo("./testdata/fakecpufile.txt")
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, c)

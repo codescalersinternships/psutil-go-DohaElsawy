@@ -20,18 +20,24 @@ type CpuInfo struct {
 }
 
 type cpuFile struct {
-	readData func(path string) (string, error)  
+	readData func(path string) (string, error)
 }
 
-
 func GetCpuInfo() (CpuInfo, error) {
-	
+
+	defaultPath := "/proc/cpuinfo"
+
+	return getCpuInfo(defaultPath)
+}
+
+func getCpuInfo(path string) (CpuInfo, error) {
+
 	cpuf := newCpuFile()
 
-	data, err := cpuf.readData("/proc/cpuinfo")
+	data, err := cpuf.readData(path)
 
 	if err != nil {
-		return CpuInfo{},nil
+		return CpuInfo{}, nil
 	}
 
 	cpu := newCpu()
@@ -39,19 +45,13 @@ func GetCpuInfo() (CpuInfo, error) {
 	err = cpu.parseCpuData(data)
 
 	if err != nil {
-		return CpuInfo{} , err
+		return CpuInfo{}, err
 	}
 	return cpu, nil
+
 }
 
-
-func newCpuFile() cpuFile{
-	return cpuFile{
-		readData: loadCpudata,
-	}
-}
-
-func loadCpudata(path string) (string, error) {
+func loadData(path string) (string, error) {
 
 	data, err := os.ReadFile(path)
 
@@ -62,6 +62,11 @@ func loadCpudata(path string) (string, error) {
 	return string(data), nil
 }
 
+func newCpuFile() cpuFile {
+	return cpuFile{
+		readData: loadData,
+	}
+}
 
 func newCpu() CpuInfo {
 	return CpuInfo{
@@ -73,14 +78,13 @@ func newCpu() CpuInfo {
 	}
 }
 
-
 func (c *CpuInfo) parseCpuData(data string) error {
 
 	lines := strings.Split(data, "\n")
 
 	for _, line := range lines {
 
-		keyVal := strings.SplitN(line, ":",2)
+		keyVal := strings.SplitN(line, ":", 2)
 		key := keyVal[0]
 		value := keyVal[1]
 

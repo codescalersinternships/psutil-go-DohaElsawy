@@ -13,15 +13,28 @@ type MemInfo struct {
 	whenQuit  int
 }
 
+type iFile interface {
+	loadData() (string, error)
+}
+
+var _ iFile = (*memFile)(nil)
+
 type memFile struct {
-	readData func(path string) (string, error)
+	fileName string
 }
 
 func GetMemInfo() (MemInfo, error) {
 
-	memf := newCpuFile()
+	defaultPath := "/proc/meminfo"
 
-	data, err := memf.readData("/proc/meminfo")
+	return getMemInfo(defaultPath)
+
+}
+
+func getMemInfo(path string) (MemInfo, error) {
+	memf := newMemFile(path)
+
+	data, err := memf.loadData()
 
 	if err != nil {
 		return MemInfo{}, nil
@@ -37,21 +50,21 @@ func GetMemInfo() (MemInfo, error) {
 	return mem, nil
 }
 
-func newMemFile() memFile {
-	return memFile{
-		readData: loadMemdata,
-	}
-}
+func (m *memFile) loadData() (string, error) {
 
-func loadMemdata(path string) (string, error) {
-
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(m.fileName)
 
 	if err != nil {
 		return "", err
 	}
 
 	return string(data), nil
+}
+
+func newMemFile(path string) memFile {
+	return memFile{
+		fileName: path,
+	}
 }
 
 func newMem() MemInfo {
