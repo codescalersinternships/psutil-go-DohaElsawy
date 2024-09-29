@@ -16,6 +16,12 @@ func TestListProc(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, listproc)
+		
+		for _, proc := range listproc {
+
+			assert.NotEmpty(t,proc.Name)
+			assert.NotEmpty(t, proc.Name)
+		}
 	})
 	t.Run("return error proc list form priavte list", func(t *testing.T) {
 
