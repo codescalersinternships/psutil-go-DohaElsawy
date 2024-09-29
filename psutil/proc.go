@@ -1,7 +1,6 @@
 package psutil
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -14,13 +13,38 @@ type Process struct {
 	Name string
 }
 
-var (
-	ErrNoNameForProcess = errors.New("impossible no name for the process")
-)
+type iProcFile interface {
+	openProc() ([]string, error)
+	// newProcFile(path string)
+}
+
+var _ iProcFile = (*procFile)(nil)
+
+type procFile struct {
+	fileName string
+}
 
 func ListProc() ([]Process, error) {
 
-	fpid, err := openProc()
+	procf := newProcFile("/proc")
+
+	return listProc(&procf)
+}
+
+func GetProcDetails(path string) (string, error) {
+
+	data, err := os.ReadFile(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+func listProc(procf iProcFile) ([]Process, error) {
+
+	fpid, err := procf.openProc()
 
 	if err != nil {
 		return nil, err
@@ -33,10 +57,17 @@ func ListProc() ([]Process, error) {
 	}
 
 	return listProc, nil
+
 }
 
-func openProc() ([]string, error) {
-	dirProc, err := os.Open("/proc")
+func newProcFile(path string) procFile {
+	return procFile{
+		fileName: path,
+	}
+}
+
+func (procf *procFile) openProc() ([]string, error) {
+	dirProc, err := os.Open(procf.fileName)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +78,6 @@ func openProc() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%v", pids)
 
 	return pids, nil
 }
@@ -63,11 +93,15 @@ func parseProcDir(pids []string) ([]Process, error) {
 			continue
 		}
 
-		name, err := getProcName(id)
+		path := fmt.Sprintf("/proc/%d/status", id)
+
+		data, err := GetProcDetails(path)
 
 		if err != nil {
 			return nil, err
 		}
+
+		name := getProcName(data)
 
 		proc.PID = id
 		proc.Name = name
@@ -77,24 +111,7 @@ func parseProcDir(pids []string) ([]Process, error) {
 	return processList, nil
 }
 
-func getProcDetails(pid int) (string, error) {
-	path := fmt.Sprintf("/proc/%d/status", pid)
-
-	data, err := os.ReadFile(path)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
-}
-
-func getProcName(pid int) (string, error) {
-	data, err := getProcDetails(pid)
-
-	if err != nil {
-		return "", err
-	}
+func getProcName(data string) string {
 
 	lines := strings.Split(data, "\n")
 
@@ -109,8 +126,8 @@ func getProcName(pid int) (string, error) {
 		value = strings.TrimSpace(value)
 
 		if key == "Name" {
-			return value, nil
+			return value
 		}
 	}
-	return "", ErrNoNameForProcess
+	return ""
 }
