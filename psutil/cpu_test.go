@@ -1,6 +1,7 @@
 package psutil
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,19 +10,10 @@ import (
 func TestCpuInfo(t *testing.T) {
 
 	t.Run("get actual data from private get function", func(t *testing.T) {
-		c, err := getCpuInfo("./testdata/fakecpufile.txt")
 
-		assert.NoError(t, err)
-		assert.NotEmpty(t, c)
-		assert.NotEmpty(t, c.Vendor)
-		assert.NotEmpty(t, c.MdoelName)
-		assert.NotEmpty(t, c.CacheSize)
-		assert.NotEmpty(t, c.CPUMHZ)
+		fcpu := newFakeCpuFile()
 
-	})
-
-	t.Run("get actual data from public get function", func(t *testing.T) {
-		c, err := GetCpuInfo()
+		c, err := getCpuInfo(&fcpu)
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, c)
@@ -36,9 +28,8 @@ func TestCpuInfo(t *testing.T) {
 
 func TestLoadData(t *testing.T) {
 
-	file := newCpuFile()
-
-	data, err := file.readData("./testdata/fakecpufile.txt")
+	file := newFakeCpuFile()
+	data, err := file.loadData()
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, data)
@@ -126,4 +117,25 @@ apicid		: 0`,
 		})
 	}
 
+}
+
+type fakeCpuFile struct {
+	fileName string
+}
+
+func newFakeCpuFile() fakeCpuFile {
+	return fakeCpuFile{
+		fileName: "./testdata/fakecpufile.txt",
+	}
+}
+
+func (c *fakeCpuFile) loadData() (string, error) {
+
+	data, err := os.ReadFile(c.fileName)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
