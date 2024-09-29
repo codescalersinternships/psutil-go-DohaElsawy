@@ -20,7 +20,6 @@ func TestCpuInfo(t *testing.T) {
 
 	})
 
-
 	t.Run("get actual data from public get function", func(t *testing.T) {
 		c, err := GetCpuInfo()
 
@@ -122,8 +121,8 @@ apicid		: 0`,
 
 			err := c.parseCpuData(test.input)
 
-			assert.Equal(t,test.err, err)
-			assert.Equal(t,c,test.expected)
+			assert.Equal(t, test.err, err)
+			assert.Equal(t, c, test.expected)
 		})
 	}
 

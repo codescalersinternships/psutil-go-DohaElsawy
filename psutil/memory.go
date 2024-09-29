@@ -23,7 +23,6 @@ type memFile struct {
 	fileName string
 }
 
-
 func GetMemInfo() (MemInfo, error) {
 	memf := newMemFile()
 
