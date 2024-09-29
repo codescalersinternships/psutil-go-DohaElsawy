@@ -23,6 +23,16 @@ psutil-go is a lightweight, library in Go that provides essential system informa
   m, err := GetMemInfo()
 ```
 
+- 3 - Get all running process list:
+ ```golang
+ listproc, err := ListProc()
+```
+
+- 2 - Get process details by its id:
+ ```golang
+  procDetails, err := GetProcDetails(PID)
+```
+
 ### Test
 - to run all tests
 ```golang
