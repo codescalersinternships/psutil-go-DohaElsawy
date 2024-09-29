@@ -15,11 +15,11 @@ type MemInfo struct {
 	whenQuit  int
 }
 
-type iFile interface {
+type iMemFile interface {
 	loadData() (string, error)
 }
 
-var _ iFile = (*memFile)(nil)
+var _ iMemFile = (*memFile)(nil)
 
 type memFile struct {
 	fileName string
