@@ -8,9 +8,19 @@ import (
 
 func TestMemInfo(t *testing.T) {
 
-	t.Run("get actual data", func(t *testing.T) {
-
+	t.Run("get actual data from private get function", func(t *testing.T) {
 		m, err := getMemInfo("./testdata/fakememfile.txt")
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, m)
+		assert.NotEmpty(t, m.Available)
+		assert.NotEmpty(t, m.Used)
+		assert.NotEmpty(t, m.Total)
+
+	})
+
+	t.Run("get actual data from public get function", func(t *testing.T) {
+		m, err := GetMemInfo()
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, m)
