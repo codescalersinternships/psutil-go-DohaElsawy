@@ -7,10 +7,12 @@ import (
 	"strings"
 )
 
+// Generic file system errors.
 var (
-	ErrFindEnoughFields = errors.New("cpuinfo: did't find all data")
+	ErrFindEnoughFields = errors.New("info: did't find all data")
 )
 
+// MemInfo represent memory info structure
 type CpuInfo struct {
 	Vendor    string
 	MdoelName string
@@ -23,6 +25,7 @@ type cpuFile struct {
 	readData func(path string) (string, error)
 }
 
+// GetCpuInfo return CPU info struncture and error if found
 func GetCpuInfo() (CpuInfo, error) {
 
 	defaultPath := "/proc/cpuinfo"

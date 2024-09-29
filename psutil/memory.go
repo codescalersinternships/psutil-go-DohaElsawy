@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+
+// MemInfo represent memory info structure
 type MemInfo struct {
 	Total     string
 	Used      string
@@ -23,6 +25,8 @@ type memFile struct {
 	fileName string
 }
 
+
+// GetMemInfo return memory info struncture and error if found
 func GetMemInfo() (MemInfo, error) {
 	memf := newMemFile()
 
