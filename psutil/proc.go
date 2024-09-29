@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Process represent process structure
 type Process struct {
 	PID  int
 	Name string
@@ -24,6 +25,7 @@ type procFile struct {
 	fileName string
 }
 
+// ListProc return processes list and error if found
 func ListProc() ([]Process, error) {
 
 	procf := newProcFile("/proc")
@@ -31,7 +33,14 @@ func ListProc() ([]Process, error) {
 	return listProc(&procf)
 }
 
-func GetProcDetails(path string) (string, error) {
+// GetProcDetails returns details about procsess and error if found
+func GetProcDetails(pid int) (string, error) {
+
+	path := fmt.Sprintf("/proc/%d/status", pid)
+	return getProcData(path)
+}
+
+func getProcData(path string) (string, error) {
 
 	data, err := os.ReadFile(path)
 
@@ -95,7 +104,7 @@ func parseProcDir(pids []string) ([]Process, error) {
 
 		path := fmt.Sprintf("/proc/%d/status", id)
 
-		data, err := GetProcDetails(path)
+		data, err := getProcData(path)
 
 		if err != nil {
 			return nil, err

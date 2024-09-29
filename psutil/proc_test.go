@@ -16,10 +16,10 @@ func TestListProc(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, listproc)
-		
+
 		for _, proc := range listproc {
 
-			assert.NotEmpty(t,proc.Name)
+			assert.NotEmpty(t, proc.Name)
 			assert.NotEmpty(t, proc.Name)
 		}
 	})
@@ -34,6 +34,15 @@ func TestListProc(t *testing.T) {
 	})
 }
 
+func TestGetDetails(t *testing.T) {
+	t.Run("valid details", func(t *testing.T) {
+		path := "psutil/testdata/1/status"
+		data, err := getProcData(path)
+
+		assert.Error(t, err)
+		assert.Empty(t, data)
+	})
+}
 
 type fakeProcFile struct {
 	fileName string
