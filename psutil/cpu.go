@@ -31,8 +31,6 @@ type iCpuFile interface {
 
 var _ iCpuFile = (*cpuFile)(nil)
 
-
-
 // GetCpuInfo return CPU info struncture and error if found
 func GetCpuInfo() (CpuInfo, error) {
 
